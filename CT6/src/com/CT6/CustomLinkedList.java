@@ -1,19 +1,21 @@
 package com.CT6;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public class CustomLinkedList {
     private Node head;
     private Node tail;
-
-    // Other methods...
 
     /**
      * Default constructor to create empty CustomLinkedList
      */
     public CustomLinkedList() {
         this.head = null;
+        this.tail = null;
     }
 
     /**
@@ -68,41 +70,60 @@ public class CustomLinkedList {
                 // Check if the removed Node was the tail
                 if (currentNode.next == null) {
                     tail = currentNode;
-                    System.out.println(tail.data);
                 }
                 return;
             }
             // Move to next Node in list
             currentNode = currentNode.next;
         }
+
+        System.out.println("Unable to delete '" + data + "', value not found.");
     }
 
     /**
      * Creates an iterator for traversing the linked list
-     * @return new LinkedListIterator variable
+     * @return new LinkedListIterator object
      */
     public Iterator<Integer> iterator() {
         return new LinkedListIterator();
     }
 
+    /**
+     * Node class to be used by CustomLinkedList
+     */
     private class Node {
         int data;
         Node next;
 
+        /**
+         * Parameterized constructor for Node
+         * @param data the data to be stored within the Node
+         */
         Node(int data) {
             this.data = data;
             this.next = null;
         }
     }
 
+    /**
+     * Implements a iterator object for the CustomLinkedList
+     */
     private class LinkedListIterator implements Iterator<Integer> {
         private Node current = head;
 
+        /**
+         * Override hasNext method for LinkedListIterator
+         * @return true if the there is a next Node or false if there is not
+         */
         @Override
         public boolean hasNext() {
             return current != null;
         }
 
+        /**
+         * Override next method for LinkedListIterator
+         * @return data of current Node
+         */
         @Override
         public Integer next() {
             if (!hasNext()) {
@@ -114,5 +135,29 @@ public class CustomLinkedList {
         }
     }
 
-    // Other methods...
+    /**
+     * Reads integer data from a file and stores each integer as a Node in the CustomLinkedList
+     * @param fileName the name of the file containing data
+     */
+    public void readFromFile(String fileName) {
+        File file = new File(fileName);
+        // Attempt to open the file
+        try (Scanner scnr = new Scanner(file)) {
+            // Read each integer and store into list
+            while (scnr.hasNext()) {
+                // Check if next token is an integer
+                if (scnr.hasNextInt()) {
+                    this.insert(scnr.nextInt());
+                }
+                // Skip next token
+                else {
+                    scnr.next();
+                }
+            }
+        }
+        // Handle potential exception from opening the file
+        catch (FileNotFoundException e) {
+            System.out.println("Invalid filename: " + fileName);
+        }
+    }
 }
