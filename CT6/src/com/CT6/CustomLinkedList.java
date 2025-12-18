@@ -5,15 +5,36 @@ import java.util.NoSuchElementException;
 
 public class CustomLinkedList {
     private Node head;
+    private Node tail;
 
     // Other methods...
+
+    /**
+     * Default constructor to create empty CustomLinkedList
+     */
+    public CustomLinkedList() {
+        this.head = null;
+    }
 
     /**
      * Inserts a new node with the given data
      * @param data the data assigned to a node
      */
     public void insert(int data) {
-        // FIXME: Implement insertion logic
+        // Create new Node with the data passed as an argument
+        Node newNode = new Node(data);
+
+        // Check if the list is empty
+        if (head == null) {
+            // Set newNode as the head and tail node
+            head = newNode;
+            tail = newNode;
+        }
+        else {
+            // Insert new node at the end of the list
+            tail.next = newNode;
+            tail = newNode;
+        }
     }
 
     /**
