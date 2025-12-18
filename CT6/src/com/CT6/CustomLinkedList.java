@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * Custom linked list class that inserts at the tail and removes from the head
+ *
+ * @author Nolan_Hill
+ */
 public class CustomLinkedList {
     private Node head;
     private Node tail;

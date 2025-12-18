@@ -1,0 +1,100 @@
+/* 
+ A sorting algorithm that implements the Radix approach.
+ Algorithm that sorts each element of array into buckets from 0-9 based on the digit being evaluated,
+ from least significant to most significant.
+*/
+
+CLASS RadixSort
+    /*
+     A method that uses array of ArrayLists to hold each value as they are evaluated
+    */
+    METHOD radixSort(values AS ARRAY OF int)
+        // Array of ArrayLists that act as the buckets from 0 to 9
+        DECLARE buckets AS ARRAY OF ArrayList<Integer> WITH SIZE 10
+
+        // Find largest number in input array
+        DECLARE int maxNum = FIND_MAXIMUM(values)
+
+        // Find the highest number of digits that will occur
+        DECLARE int maxDigits = COUNT_DIGITS(maxNum)
+
+        // Initiate each ArrayList (bucket)
+        FOR int i = 0 TO 9 DO
+            buckets[i] = NEW ArrayList
+        ENDFOR
+
+        // Declare and initiate variable to hold location of digit
+        DECLARE int powerTen = 1
+
+        // Variable to hold index of bucket
+        DECLARE bucketNumber
+        
+        // Iterate through elements to fill the buckets from the least significant digit to most
+        FOR int digitIndex = 0 TO maxDigits DO
+            // Evaluate each element according to the digit location
+            FOR int i = 0 TO SIZE(values) DO
+                bucketNumber = ABS((values[i] DIV powerTen) MOD 10)
+                APPEND values[i] TO buckets[bucketNumber]
+            END FOR
+          
+            // Declare and initialize iterator variable for values array
+            DECLARE int valuesIndex = 0
+            
+            // Iterate through each buckets
+            FOR int i = 0 to 9 DO
+                // Iterate through the values of each bucket and assign them to values array
+                FOR int j = 0 TO SIZE(buckets[i]) DO
+                    values[valuesIndex] = buckets[i][j]
+                    INCREMENT valuesIndex
+                END FOR
+            END FOR
+
+            // Clear values out of the bucket
+            FOR int i = 0 TO 9 DO
+                CLEAR(buckets[i])
+            END FOR
+      
+            // Move to the next significant digit
+            powerTen = powerTen * 10
+        END FOR
+    END METHOD        
+END CLASS
+
+/* 
+ Class to test out the radix sort algorithm
+*/
+CLASS RadixSortTest
+    /*
+     Test program that takes three sample arrays and sorts them using the RadixSort method.
+    */
+    MAIN METHOD
+        // Store three array samples
+        DECLARE sample1 AS ARRAY OF int = [783, 99, 472, 182, 264, 543, 356, 295, 692, 491, 94]
+        DECLARE sample1 AS ARRAY OF int = [342, 789, 156, 923, 467, 621, 84, 735, 298, 512]
+        DECLARE sample1 AS ARRAY OF int = [7234, 3891, 9456, 1672, 5823, 4109, 8567, 2345, 6901, 
+                                           3478, 9012, 1234, 7890, 4567, 6123]
+ 
+        // Sort each sample array using the radixSort method
+        CALL radixSort(sample1)
+        CALL radixSort(sample2)
+        CALL radixSort(sample3)
+
+        // Print sorted elements of first sample
+        FOR EACH element IN sample1 DO
+            OUTPUT element + " "
+        END FOR
+        OUTPUT NEWLINE
+
+        // Print sorted elements of second sample
+        FOR EACH element IN sample2 DO
+            OUTPUT element + " "
+        END FOR
+        OUTPUT NEWLINE
+
+        // Print sorted elements of third sample
+        FOR EACH element IN sample3 DO
+            OUTPUT element + " "
+        END FOR
+        OUTPUT NEWLINE
+    END METHOD
+END CLASS
