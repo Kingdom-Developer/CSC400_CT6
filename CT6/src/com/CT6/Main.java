@@ -11,6 +11,8 @@ public class Main {
         linkedList.insert(2);
         linkedList.insert(3);
 
+        linkedList.delete(3);
+
         // Iterate and display elements
         Iterator<Integer> iterator = linkedList.iterator();
         while (iterator.hasNext()) {

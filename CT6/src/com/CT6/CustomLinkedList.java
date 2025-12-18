@@ -42,7 +42,39 @@ public class CustomLinkedList {
      * @param data the data to look for in node for deletion
      */
     public void delete(int data) {
-        // FIXME: Implement deletion logic
+        // Check if the list is empty
+        if (head == null) {
+            return;
+        }
+
+        // Check if head Node contains first occurrence of data
+        if (head.data == data) {
+            head = head.next;
+            // Check if list is now empty and set tail to null if it is
+            if (head == null) {
+                tail = null;
+            }
+            return;
+        }
+
+        Node currentNode = head;
+        // Traverse through list to check if any Node's data matches the input data and if so, remove the Node
+        while (currentNode.next != null) {
+            // Check if currentNode's next Node's data matches
+            if (currentNode.next.data == data) {
+                // Remove currentNode's next Node
+                currentNode.next = currentNode.next.next;
+
+                // Check if the removed Node was the tail
+                if (currentNode.next == null) {
+                    tail = currentNode;
+                    System.out.println(tail.data);
+                }
+                return;
+            }
+            // Move to next Node in list
+            currentNode = currentNode.next;
+        }
     }
 
     /**
