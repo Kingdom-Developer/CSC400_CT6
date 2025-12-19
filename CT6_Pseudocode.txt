@@ -1,100 +1,188 @@
 /* 
- A sorting algorithm that implements the Radix approach.
- Algorithm that sorts each element of array into buckets from 0-9 based on the digit being evaluated,
- from least significant to most significant.
+ Custom linked list class that inserts at the tail and removes from the head
 */
 
-CLASS RadixSort
+CLASS CustomLinkedList
+    DECLARE PRIVATE Node head
+    DECLARE PRIVATE Node tail
+    
+     
     /*
-     A method that uses array of ArrayLists to hold each value as they are evaluated
-    */
-    METHOD radixSort(values AS ARRAY OF int)
-        // Array of ArrayLists that act as the buckets from 0 to 9
-        DECLARE buckets AS ARRAY OF ArrayList<Integer> WITH SIZE 10
+     * Default constructor to create empty CustomLinkedList
+     */
+    CONSTRUCTOR CustomLinkedList
+        THIS.head = NULL
+        THIS.tail = NULL
+    END CONSTRUCTOR
 
-        // Find largest number in input array
-        DECLARE int maxNum = FIND_MAXIMUM(values)
+    /*
+     * Inserts a new node with the given data
+     */
+    METHOD insert(int data)
+        // Create new Node with the data passed as an argument
+        DECLARE newNode = NEW Node(data)
 
-        // Find the highest number of digits that will occur
-        DECLARE int maxDigits = COUNT_DIGITS(maxNum)
+        IF head EQUALS NULL THEN
+            // Set newNode as the head and tail node
+            head = newNode
+            tail = newNode
+        ELSE
+            // Insert new node at the end of the list
+            tail.next = newNode
+            tail = newNode
+        END IF
+    END METHOD
 
-        // Initiate each ArrayList (bucket)
-        FOR int i = 0 TO 9 DO
-            buckets[i] = NEW ArrayList
-        ENDFOR
-
-        // Declare and initiate variable to hold location of digit
-        DECLARE int powerTen = 1
-
-        // Variable to hold index of bucket
-        DECLARE bucketNumber
-        
-        // Iterate through elements to fill the buckets from the least significant digit to most
-        FOR int digitIndex = 0 TO maxDigits DO
-            // Evaluate each element according to the digit location
-            FOR int i = 0 TO SIZE(values) DO
-                bucketNumber = ABS((values[i] DIV powerTen) MOD 10)
-                APPEND values[i] TO buckets[bucketNumber]
-            END FOR
-          
-            // Declare and initialize iterator variable for values array
-            DECLARE int valuesIndex = 0
-            
-            // Iterate through each buckets
-            FOR int i = 0 to 9 DO
-                // Iterate through the values of each bucket and assign them to values array
-                FOR int j = 0 TO SIZE(buckets[i]) DO
-                    values[valuesIndex] = buckets[i][j]
-                    INCREMENT valuesIndex
-                END FOR
-            END FOR
-
-            // Clear values out of the bucket
-            FOR int i = 0 TO 9 DO
-                CLEAR(buckets[i])
-            END FOR
+    /*
+     * Deletes the first occurrence of a node with the given data
+     */
+    METHOD delete(int data)
+        // Check if the list is empty
+        IF head EQUALS NULL THEN
+            RETURN
+        END IF
+    
+        IF head.data EQUALS data THEN
+            head = head.next
       
-            // Move to the next significant digit
-            powerTen = powerTen * 10
-        END FOR
-    END METHOD        
+            // Check if list is now empty and set tail to null if it is
+            IF head EQUALS NULL THEN
+                tail = NULL
+            END IF
+            RETURN
+        END IF
+
+        DECLARE currentNode = head
+       
+        // Traverse through list to check if any Node's data matches the input data and if so, remove the Node
+        WHILE currentNode.next DOES NOT EQUAL NULL DO
+            // Check if currentNode's next Node's data matches
+            IF currentNode.next.data EQUALS data THEN
+                // Remove currentNode's next Node
+                currentNode.next = currentNode.next.next
+
+                // Check if the removed Node was the tail
+                IF currentNode.next EQUALS NULL THEN
+                    tail = currentNode
+                END IF
+                RETURN
+            END IF
+            
+            // Move to next Node in list
+            currentNode = currentNode.next
+        END WHILE
+
+        // When method reaches this point, print that the value was not found
+        OUTPUT "Unable to delete '" + data + "', value not found." + NEWLINE
+    END METHOD
+
+    /*
+     * Creates an iterator for traversing the linked list
+     */
+    METHOD Iterator of Integer iterator()
+        RETURN NEW LinkedListIterator
+    END METHOD
+
+    /*
+     * Node class to be used by CustomLinkedList
+     */
+    PRIVATE CLASS Node
+        DECLARE int data
+        DECLARE Node next
+    
+        /*
+         * Parameterized constructor for Node
+         */
+        CONSTRUCTOR Node(int data)
+            THIS.data = data
+            THIS.next = NULL
+        END CONSTRUCTOR
+    END CLASS
+
+    /*
+     * Implements a iterator object for the CustomLinkedList
+     */
+    PRIVATE CLASS LinkedListIterator IMPLEMENTS Iterator of Integer
+        DECLARE PRIVATE Node current = head
+        
+        /*
+         * Override hasNext method for LinkedListIterator
+         */
+        METHOD Boolean hasNext()
+            RETURN current IS NOT NULL
+        END METHOD
+
+        /*
+         * Override next method for LinkedListIterator
+         */
+        METHOD Integer next()
+            IF NOT CALL hasNext() THEN
+                THROW EXCEPTION NoSuchElementException
+            END IF
+            
+            DECLARE int data = current.data
+            current = current.next
+            RETURN data
+        END METHOD
+    END CLASS
+
+    /*
+     * Reads integer data from a file and stores each integer as a Node in the CustomLinkedList
+     */
+    METHOD readFromFile(String filename)
+        // Attempt to open the file
+        TRY
+            DECLARE FILE file = NEW File(filename)
+            DECLARE SCANNER scnr = NEW Scanner(file)
+            
+            // Read each integer and store into list
+            WHILE CALL scnr.hasNext() DO
+                // Check if next token is an integer
+                IF CALL scnr.hasNextInt() THEN
+                    CALL THIS.insert(CALL scnr.nextInt())
+                // Skip next token
+                ELSE
+                    CALL scnr.next()
+                END IF
+            END WHILE
+        // Handle potential exception from opening the file
+        CATCH FileNotFoundException e
+            OUTPUT "Invalid file name: " + filename + NEWLINE
+        END TRY
+    END METHOD
 END CLASS
 
-/* 
- Class to test out the radix sort algorithm
-*/
-CLASS RadixSortTest
-    /*
-     Test program that takes three sample arrays and sorts them using the RadixSort method.
-    */
+/*
+ * Program that utilizes the CustomLinkedList and performs inserting single values
+ * and multiple values that are read from file, deleting values, and creates iterator
+ * object to iterate through the linked list.
+ */
+CLASS Main
     MAIN METHOD
-        // Store three array samples
-        DECLARE sample1 AS ARRAY OF int = [783, 99, 472, 182, 264, 543, 356, 295, 692, 491, 94]
-        DECLARE sample1 AS ARRAY OF int = [342, 789, 156, 923, 467, 621, 84, 735, 298, 512]
-        DECLARE sample1 AS ARRAY OF int = [7234, 3891, 9456, 1672, 5823, 4109, 8567, 2345, 6901, 
-                                           3478, 9012, 1234, 7890, 4567, 6123]
- 
-        // Sort each sample array using the radixSort method
-        CALL radixSort(sample1)
-        CALL radixSort(sample2)
-        CALL radixSort(sample3)
+        // Initiate new CustomLinkedList
+        DECLARE CustomLinkedList linkedList = NEW CustomLinkedList
 
-        // Print sorted elements of first sample
-        FOR EACH element IN sample1 DO
-            OUTPUT element + " "
-        END FOR
-        OUTPUT NEWLINE
+        // Insert some elements
+        CALL linkedList.insert(1)
+        CALL linkedList.insert(2)
+        CALL linkedList.insert(3)
 
-        // Print sorted elements of second sample
-        FOR EACH element IN sample2 DO
-            OUTPUT element + " "
-        END FOR
-        OUTPUT NEWLINE
+        // Delete some elements
+        CALL linkedList.delete(2);
+        CALL linkedList.delete(1);
+        
+        // Attempt to delete element that doesn't exist in list
+        CALL linkedList.delete(34);
 
-        // Print sorted elements of third sample
-        FOR EACH element IN sample3 DO
-            OUTPUT element + " "
-        END FOR
-        OUTPUT NEWLINE
+        // Test the readFromFile method
+        CALL linkedList.readFromFile("data.txt")
+
+        // Create iterator object for the CustomLinkedList
+        DECLARE Iterator of Integer iterator = CALL linkedListIterator()
+
+        // Iterate and display elements
+        WHILE CALL iterator.hasNext() DO
+            OUTPUT CALL iterator.next() + " "
+        END WHILE
     END METHOD
 END CLASS

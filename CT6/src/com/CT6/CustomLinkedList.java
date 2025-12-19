@@ -57,6 +57,7 @@ public class CustomLinkedList {
         // Check if head Node contains first occurrence of data
         if (head.data == data) {
             head = head.next;
+
             // Check if list is now empty and set tail to null if it is
             if (head == null) {
                 tail = null;
@@ -78,10 +79,11 @@ public class CustomLinkedList {
                 }
                 return;
             }
+
             // Move to next Node in list
             currentNode = currentNode.next;
         }
-
+        // When method reaches this point, print that the value was not found
         System.out.println("Unable to delete '" + data + "', value not found.");
     }
 
@@ -130,7 +132,7 @@ public class CustomLinkedList {
          * @return data of current Node
          */
         @Override
-        public Integer next() {
+        public Integer next() throws NoSuchElementException {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -142,10 +144,10 @@ public class CustomLinkedList {
 
     /**
      * Reads integer data from a file and stores each integer as a Node in the CustomLinkedList
-     * @param fileName the name of the file containing data
+     * @param filename the name of the file containing data
      */
-    public void readFromFile(String fileName) {
-        File file = new File(fileName);
+    public void readFromFile(String filename) {
+        File file = new File(filename);
         // Attempt to open the file
         try (Scanner scnr = new Scanner(file)) {
             // Read each integer and store into list
@@ -162,7 +164,7 @@ public class CustomLinkedList {
         }
         // Handle potential exception from opening the file
         catch (FileNotFoundException e) {
-            System.out.println("Invalid filename: " + fileName);
+            System.out.println("Invalid filename: " + filename);
         }
     }
 }

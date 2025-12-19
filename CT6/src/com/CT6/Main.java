@@ -20,14 +20,19 @@ public class Main {
         linkedList.insert(3);
 
         // Delete some elements
+        linkedList.delete(2);
         linkedList.delete(1);
+
+        // Attempt to delete element that doesn't exist in list
         linkedList.delete(34);
 
         // Test the readFromFile method
         linkedList.readFromFile("data.txt");
 
-        // Iterate and display elements
+        // Create iterator object for the CustomLinkedList
         Iterator<Integer> iterator = linkedList.iterator();
+
+        // Iterate and display elements
         while (iterator.hasNext()) {
             System.out.print(iterator.next() + " ");
         }
